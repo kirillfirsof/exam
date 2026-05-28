@@ -79,7 +79,7 @@ public class ProductService {
 
     // ===== Преобразования =====
 
-    private ProductDto toDto(Product product) {
+    public ProductDto toDto(Product product) {
         DiscountDto discountDto = null;
         if (product.getDiscount() != null) {
             Discount d = product.getDiscount();

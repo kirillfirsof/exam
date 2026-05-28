@@ -58,3 +58,10 @@ export const updateOrderStatus = (id, status) =>
 export const getUsers = () => authFetch('/admin/users');
 export const updateUser = (id, data) => authFetch(`/admin/users/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteUser = (id) => authFetch(`/admin/users/${id}`, { method: 'DELETE' });
+
+
+// Favorites
+export const getFavorites = () => authFetch('/favorites');
+export const addToFavorites = (productId) => authFetch(`/favorites/${productId}`, { method: 'POST' });
+export const removeFromFavorites = (productId) => authFetch(`/favorites/${productId}`, { method: 'DELETE' });
+export const isFavorite = (productId) => authFetch(`/favorites/${productId}/is-favorite`);

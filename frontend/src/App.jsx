@@ -8,6 +8,7 @@ import AdminProductsPage from './pages/AdminProductsPage';
 import AdminOrdersPage from './pages/AdminOrdersPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
+import FavoritesPage from './pages/FavoritesPage';
 
 
 export default function App() {
@@ -59,6 +60,9 @@ export default function App() {
                         <NavButton active={page === 'my-orders'} onClick={() => setPage('my-orders')}>
                             Мои заказы
                         </NavButton>
+                        <NavButton active={page === 'favorites'} onClick={() => setPage('favorites')}>
+                            + Избранное
+                        </NavButton>
                         {isAdmin && (
                             <>
                                 <span className="text-gray-300 mx-1">|</span>
@@ -103,11 +107,13 @@ export default function App() {
                 )}
                 {page === 'admin-users' && <AdminUsersPage />}
                 {page === 'order-detail' && (
-                <OrderDetailPage
-                    orderId={selectedOrderId}
-                    onBack={() => setPage('my-orders')}
-                />
-            )}
+                    <OrderDetailPage
+                        orderId={selectedOrderId}
+                        onBack={() => setPage('my-orders')}
+                    />
+                    
+                )}
+                {page === 'favorites' && <FavoritesPage />}
             </main>
         </div>
     );

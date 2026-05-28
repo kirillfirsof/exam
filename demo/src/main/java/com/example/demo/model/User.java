@@ -1,11 +1,10 @@
 package com.example.demo.model;
 
-import java.util.Collection;
-import java.util.List;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Set;
+import java.util.HashSet;
+
+
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,4 +38,14 @@ public class User{
     @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
+
+ 
+    @ManyToMany
+    @JoinTable(
+        name = "user_favorites",                  // промежуточная таблица
+        joinColumns = @JoinColumn(name = "user_id"),       // ссылка на пользователя
+        inverseJoinColumns = @JoinColumn(name = "product_id")  // ссылка на товар
+    )
+    @Builder.Default
+    private Set<Product> favorites = new HashSet<>();
 }

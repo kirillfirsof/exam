@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProducts, createOrder, getUsername } from '../api';
+import { getProducts, createOrder, addToFavorites, removeFromFavorites, getFavorites } from '../api';
 
 export default function CatalogPage() {
     const [products, setProducts] = useState([]);
@@ -7,6 +7,7 @@ export default function CatalogPage() {
     const [search, setSearch] = useState('');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
+    const [favoriteIds, setFavoriteIds] = useState(new Set());
 
     const load = async () => {
         const params = {};
@@ -17,7 +18,34 @@ export default function CatalogPage() {
         setProducts(data);
     };
 
-    useEffect(() => { load(); }, []);
+    const loadFavorites = async () => {
+        try {
+            const data = await getFavorites();
+            // data — это массив товаров (DTO)
+            setFavoriteIds(new Set(data.map(p => p.id)));
+        } catch (e) {
+            // если ошибка — просто нет избранного
+        }
+    };
+
+    useEffect(() => {
+        load();
+        loadFavorites();
+    }, []);
+
+    const handleToggleFavorite = async (productId) => {
+        if (favoriteIds.has(productId)) {
+            await removeFromFavorites(productId);
+            setFavoriteIds(prev => {
+                const next = new Set(prev);
+                next.delete(productId);
+                return next;
+            });
+        } else {
+            await addToFavorites(productId);
+            setFavoriteIds(prev => new Set(prev).add(productId));
+        }
+    };
 
     const addToCart = (product) => {
         const existing = cart.find(i => i.productId === product.id);
@@ -36,11 +64,11 @@ export default function CatalogPage() {
         if (cart.length === 0) return alert('Корзина пуста');
         try {
             await createOrder({
-                userId: 1,  // TODO: получать реальный userId
                 items: cart.map(i => ({ productId: i.productId, quantity: i.quantity }))
             });
             alert('Заказ создан!');
             setCart([]);
+            load();
         } catch (e) {
             alert(e.message);
         }
@@ -68,7 +96,16 @@ export default function CatalogPage() {
                 {/* Сетка товаров */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {products.map(p => (
-                        <div key={p.id} className="bg-white p-4 rounded shadow">
+                        <div key={p.id} className="bg-white p-4 rounded shadow relative">
+                            {/* Сердечко */}
+                            <button
+                                onClick={() => handleToggleFavorite(p.id)}
+                                className="absolute top-2 right-2 text-2xl"
+                                title={favoriteIds.has(p.id) ? 'Удалить из избранного' : 'Добавить в избранное'}
+                            >
+                                {favoriteIds.has(p.id) ? '+' : '-'}
+                            </button>
+
                             <h3 className="font-bold">{p.name}</h3>
                             <p className="text-sm text-gray-500">{p.description}</p>
                             <p className="text-lg font-bold mt-1">{p.price} ₽</p>

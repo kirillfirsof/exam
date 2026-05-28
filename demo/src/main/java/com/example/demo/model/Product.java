@@ -1,5 +1,10 @@
 package com.example.demo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,4 +40,10 @@ public class Product {
     // Связь: товар → одна скидка (необязательная)
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Discount discount;
+
+
+    @ManyToMany(mappedBy = "favorites") // "favorites" - это имя поля в классе UserEntity
+    @JsonIgnore // чтобы не зациклить JSON
+    @Builder.Default
+    private Set<User> likedByUsers = new HashSet<>();
 }
